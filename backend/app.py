@@ -1,3 +1,6 @@
+from datetime import datetime
+
+import bcrypt
 import graphene
 from flask_graphql import GraphQLView
 
@@ -7,7 +10,7 @@ import graphene
 from graphene import ObjectType, String, List, Schema
 from flask_graphql import GraphQLView
 from pymongo import MongoClient
-
+from Register import *
 
 app = Flask(__name__)
 
@@ -23,7 +26,8 @@ db = client["freeky_db"]  # Nom de la base de données
 
 # users.insert_one({"name": "John", "lastname": "Doe", "email": "jd@mail.com" })"
 # # Création de la collection
-# event = db["event"]  # Nom de la collection
+# event
+
 
 # Définition du type GraphQL pour les soirées
 class SoireeType(graphene.ObjectType):
@@ -41,6 +45,46 @@ class Query(graphene.ObjectType):
 
 # Définition du schéma GraphQL
 schema = graphene.Schema(query=Query)
+
+
+class UserType(graphene.ObjectType):
+    FirstName = graphene.String()
+    LastName = graphene.String()
+    birthday = graphene.String()
+    email = graphene.String()
+
+class Register(graphene.Mutation):
+    class Arguments:
+        FirstName = graphene.String(required=True)
+        LastName = graphene.String(required=True)
+        birthday = graphene.String(required=True)
+        email = graphene.String(required=True)
+        password = graphene.String(required=True)
+
+    user = graphene.Field(UserType)
+
+    def mutate(self, info, FirstName, LastName, birthday, email, password):
+        print("Nouvel utilisateur enregistré :")
+        print(f"Prénom: {FirstName}")
+        print(f"Nom: {LastName}")
+        print(f"Date de naissance: {birthday}")
+        print(f"Email: {email}")
+        print(f"Mot de passe: (non affiché pour la sécurité) {password} ")
+
+        return Register(user=UserType(
+            FirstName=FirstName,
+            LastName=LastName,
+            birthday=birthday,
+            email=email
+        ))
+
+# Définition du schéma GraphQL
+class Mutation(graphene.ObjectType):
+    register = Register.Field()
+
+# Définition du schéma GraphQL
+schema = graphene.Schema(mutation=Mutation)
+
 
 # Ajout de la route GraphQL
 app.add_url_rule(
