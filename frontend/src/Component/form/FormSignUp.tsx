@@ -22,7 +22,6 @@ const FormSignUp: React.FC = () => {
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
-    // Fonction pour gérer les changements dans les champs
     const handleChange = (fieldName: keyof FormData, value: string) => {
         setFormData({
             ...formData,
@@ -30,7 +29,6 @@ const FormSignUp: React.FC = () => {
         });
     };
 
-    // Validation des champs avant la soumission
     const isFormValid = () => {
         if (
             !formData.FirstName ||
@@ -46,12 +44,64 @@ const FormSignUp: React.FC = () => {
         return true;
     };
 
-    // Soumission du formulaire
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (isFormValid()) {
             console.log("Form Data:", formData);
-            navigate('/SignIn'); // Redirection après soumission
+            try {
+                await fetchData(); // Assurer que la fonction est bien appelée
+                navigate('/SignIn');
+            } catch (error) {
+                console.error("Erreur lors de l'inscription:", error);
+            }
+        }
+    };
+
+    const fetchData = async () => {
+        const formattedBirthday = new Date(formData.birthday).toISOString().split("T")[0];
+
+        const query = `
+            mutation {
+                register(
+                    FirstName: "${formData.FirstName}",
+                    LastName: "${formData.LastName}",
+                    birthday: "${formattedBirthday}",
+                    email: "${formData.email}",
+                    password: "${formData.password}"
+                ) {
+                    user {
+                        FirstName
+                        LastName
+                        birthday
+                        email
+                    }
+                }
+            }
+        `;
+
+        try {
+            const response = await fetch("http://localhost:5000/graphql", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ query }),
+            });
+
+            const result = await response.json();
+
+            if (result.errors) {
+                console.error("Erreur GraphQL:", result.errors);
+                alert("Échec de l'inscription: " + result.errors[0].message);
+                return;
+            }
+
+            console.log("Réponse GraphQL:", result);
+
+            if (result.data.register.user) {
+                alert("Utilisateur créé avec succès !");
+            }
+        } catch (error) {
+            console.error("Erreur lors de la requête:", error);
+            alert("Une erreur est survenue lors de l'inscription.");
         }
     };
 
@@ -99,4 +149,3 @@ const FormSignUp: React.FC = () => {
 };
 
 export default FormSignUp;
-

@@ -1,3 +1,6 @@
+from datetime import datetime
+
+import bcrypt
 import graphene
 from flask_graphql import GraphQLView
 
@@ -23,7 +26,8 @@ db = client["freeky_db"]  # Nom de la base de données
 
 # users.insert_one({"name": "John", "lastname": "Doe", "email": "jd@mail.com" })"
 # # Création de la collection
-# event = db["event"]  # Nom de la collection
+# event
+
 
 # Définition du type GraphQL pour les soirées
 class SoireeType(graphene.ObjectType):
@@ -41,6 +45,12 @@ class Query(graphene.ObjectType):
 
 # Définition du schéma GraphQL
 schema = graphene.Schema(query=Query)
+
+
+
+# Définition du schéma GraphQL
+schema = graphene.Schema(mutation=Mutation)
+
 
 # Ajout de la route GraphQL
 app.add_url_rule(
