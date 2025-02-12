@@ -18,9 +18,9 @@ app.add_url_rule(
     "/graphql", view_func=GraphQLView.as_view("graphql", schema=schema, graphiql=True)
 )
 
-# @app.route('/')
-# def hello_world():  # put application's code here
-#     return 'Hello World!'
+@app.route('/')
+def hello_world():  # put application's code here
+    return 'Hello World!'
 
 
 if __name__ == '__main__':
