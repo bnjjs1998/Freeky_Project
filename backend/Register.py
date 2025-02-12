@@ -22,7 +22,7 @@ class Register(graphene.Mutation):
         print(f"Nom: {LastName}")
         print(f"Date de naissance: {birthday}")
         print(f"Email: {email}")
-        print(f"Mot de passe: {password}")
+        print(f"Mot de passe: (non affiché pour la sécurité) {password} ")
 
         return Register(user=UserType(
             FirstName=FirstName,
@@ -34,3 +34,6 @@ class Register(graphene.Mutation):
 # Définition du schéma GraphQL
 class Mutation(graphene.ObjectType):
     register = Register.Field()
+
+# Définition du schéma GraphQL
+schema = graphene.Schema(mutation=Mutation)
