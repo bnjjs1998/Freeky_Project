@@ -1,3 +1,6 @@
+import graphene
+from flask_graphql import GraphQLView
+
 from flask import Flask
 from flask_cors import CORS
 
