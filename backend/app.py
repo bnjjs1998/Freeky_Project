@@ -1,6 +1,11 @@
 from flask import Flask
+from flask_cors import CORS
 
 app = Flask(__name__)
+
+#autoriser le cors uniquement sur l'url local de react
+CORS(app, origins=["http://localhost:5173"])
+
 
 
 @app.route('/')
