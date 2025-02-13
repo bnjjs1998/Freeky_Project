@@ -1,9 +1,9 @@
-from flask import Flask
+from flask import Flask, request, jsonify
 from flask_cors import CORS
-from flask_graphql import GraphQLView
+import graphene
 from graphene import Schema
-from graphql.schema import Query as QuerySchema
-from graphql.mutations import Mutation
+from graphql_folder.schema import Query
+from graphql_folder.mutations import Mutation
 
 
 app = Flask(__name__)
@@ -12,15 +12,14 @@ app = Flask(__name__)
 CORS(app)
 
 # Définition du schéma GraphQL
-schema = Schema(query=QuerySchema, mutation=Mutation)
+schema = Schema(query=Query, mutation=Mutation)
+
+# app.add_url_rule(
+#     "/graphql",
+#     view_func=GraphQLView.as_view("graphql", schema=schema, graphiql=True),
+# )
 
 # Route GraphQL
-app.add_url_rule(
-    "/graphql",
-    view_func=GraphQLView.as_view("graphql", schema=schema, graphiql=True),
-)
-
-
 @app.route('/')
 def hello_world():  # put application's code here
     return {"message": "API Flask + GraphQL + MongoDB is ok !"}

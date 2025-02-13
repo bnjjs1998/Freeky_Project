@@ -1,5 +1,5 @@
 import graphene
-from graphene import ObjectType, String, List
+from graphene import ObjectType, String, List, Int
 from database import events_collection  # Import de la connexion MongoDB
 
 # Définition du modèle GraphQL

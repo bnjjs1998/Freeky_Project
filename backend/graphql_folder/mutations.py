@@ -1,7 +1,7 @@
 import graphene
 from graphene import ObjectType, String, Field, Boolean
 from database import events_collection  # Import de la connexion MongoDB
-from graphql.schema import EventType  # Import du modèle GraphQL
+from graphql_folder.schema import EventType  # Import du modèle GraphQL
 
 # Mutation pour ajouter une soirée
 class CreateEvent(graphene.Mutation):
