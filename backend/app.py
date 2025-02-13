@@ -113,7 +113,6 @@ class LoginMutation(graphene.Mutation):
         return LoginMutation(message="Connexion réussie.")
 
 
-        return LoginMutation(message="Connexion réussie.")
 
 
 
