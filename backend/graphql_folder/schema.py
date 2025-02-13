@@ -11,7 +11,6 @@ class EventType(ObjectType):
     location = String()
     guests_list = List(String)
     invites_number = Int()
-
 # Définition du type GraphQL pour les utilisateurs
 class UserType(graphene.ObjectType):
     id = graphene.String()
