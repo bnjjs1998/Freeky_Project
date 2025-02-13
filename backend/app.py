@@ -87,8 +87,6 @@ class Register(graphene.Mutation):
 
 
 
-
-# Mutation pour la connexion d'un utilisateur
 class LoginMutation(graphene.Mutation):
     class Arguments:
         email = graphene.String(required=True)
@@ -97,14 +95,23 @@ class LoginMutation(graphene.Mutation):
     message = graphene.String()
 
     def mutate(self, info, email, password):
-        # Vérifier si l'utilisateur existe
-        user = db["users"].find_one({"email": email})
-        if not user:
+        # Simuler la vérification de l'existence de l'utilisateur
+        print(f"Vérification de l'utilisateur avec l'email : {email}")
+        user_exists = True  # Supposons que l'utilisateur existe pour cette démonstration
+
+        if not user_exists:
             raise Exception("Utilisateur non trouvé.")
 
-        # Vérifier le mot de passe
-        if not bcrypt.checkpw(password.encode('utf-8'), user["password"].encode('utf-8')):
+        # Simuler la vérification du mot de passe
+        print(f"Vérification du mot de passe pour l'utilisateur : {email}")
+        password_correct = True  # Supposons que le mot de passe est correct pour cette démonstration
+
+        if not password_correct:
             raise Exception("Mot de passe incorrect.")
+
+        print("Connexion réussie.")
+        return LoginMutation(message="Connexion réussie.")
+
 
         return LoginMutation(message="Connexion réussie.")
 
