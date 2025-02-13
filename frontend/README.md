@@ -1,50 +1,61 @@
-# React + TypeScript + Vite
+# Freeky Project 🎉
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Bienvenue sur **Freeky Project** C’est une application destinée aux adultes majeurs et responsables, offrant la possibilité d’organiser des événements (dîners, soirées) entre inconnus ou non. L’idée est de s’amuser, de créer des moments uniques, et pourquoi pas, de tisser des liens durables. N’hésitez pas à explorer davantage pour en savoir plus !
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🛠️ Technologies utilisées
 
-## Expanding the ESLint configuration
+Ce projet utilise les technologies suivantes :
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- **React.js** pour la création d'interfaces utilisateur dynamiques
+- **TypeScript** pour un typage robuste
+- **React Router** pour la navigation entre les pages
+- **SASS (SCSS)** pour des styles personnalisés et organisés
+- [Ajoute d'autres technologies ici, si besoin]
 
-- Configure the top-level `parserOptions` property like this:
+---
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+## 📂 Architecture du projet
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+Voici une arborescence simplifiée des fichiers pour te repérer facilement dans le projet :
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+/src
+  ├── /components
+  │   ├── FormSignUp.tsx
+  │   ├── FormSignIn.tsx
+  │   └── InputField.tsx
+  ├── /views
+  │   ├── SignIn.tsx
+  │   └── SignUp.tsx
+  ├── App.tsx
+  ├── index.tsx
+  └── /styles
+      ├── FormSignUp.scss
+      ├── FormSignIn.scss
+      └── global.scss
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+
+
+---
+
+## 🚀 Installation
+
+Pour exécuter ce projet localement, suis ces étapes simples :
+
+1. Clone le projet :
+   ```bash
+   git clone https://github.com/bnjjs1998/Freeky_Project.git
+2. Accède au dossier du projet :
+   ```bash
+   cd Freeky_Project
+3. Installe les dépendances :
+   ```bash
+   npm install
+4. Lance l'application :
+   ```bash
+   npm run dev
+
+## 🎉 Remerciements
+
+S/O Baptiste et Yann :) continuera de bosser sur le projet pour l'améliorer 🚀
