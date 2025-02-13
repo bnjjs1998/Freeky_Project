@@ -5,14 +5,12 @@ import graphene
 from flask_bcrypt import check_password_hash
 from flask_jwt_extended import create_access_token
 from graphene import ObjectType, String, Field, Boolean
- # Import de la connexion MongoDB
-from .schema import EventType
-from .schema import UserType
-from .schema import Query
-from backend import database
-from backend.database import events_collection, db
+from database import events_collection  # Import de la connexion MongoDB
+from graphql_folder.schema import EventType  # Import du modèle GraphQL
+from graphql_folder.schema import UserType  # Import du modèle GraphQL
+from graphql_folder.schema import Query
 
-
+# Mutation pour ajouter une soirée
 class CreateEvent(graphene.Mutation):
     class Arguments:
         name = graphene.String(required=True)
@@ -24,18 +22,15 @@ class CreateEvent(graphene.Mutation):
     success = graphene.Boolean()
     event = graphene.Field(EventType)
 
-    def mutate(self, info, name, date, location, guests_list, invites_number):
-        nouvelle_soiree = {
+    def mutate(self, info, name, date, location, invites_number):
+        new_event = {
             "name": name,
             "date": date,
             "location": location,
-            "guests_list": guests_list,
             "invites_number": invites_number
         }
-
-
-        events_collection.insert_one(nouvelle_soiree)  # Ajout dans MongoDB
-        return CreateEvent(success=True, event=nouvelle_soiree)
+        events_collection.insert_one(new_event)  # Ajout dans MongoDB
+        return CreateEvent(success=True, event=new_event)
 
 # Ajouter la mutation au schéma
 class Mutation(ObjectType):
