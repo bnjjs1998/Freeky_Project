@@ -10,6 +10,9 @@ from graphql_folder.schema import EventType  # Import du modèle GraphQL
 from graphql_folder.schema import UserType  # Import du modèle GraphQL
 from graphql_folder.schema import Query
 
+from backend.database import db
+
+
 # Mutation pour ajouter une soirée
 class CreateEvent(graphene.Mutation):
     class Arguments:
