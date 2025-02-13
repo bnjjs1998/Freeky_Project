@@ -2,6 +2,8 @@ from datetime import datetime, date
 
 import bcrypt
 import graphene
+from flask_bcrypt import check_password_hash
+from flask_jwt_extended import create_access_token
 from graphene import ObjectType, String, Field, Boolean
  # Import de la connexion MongoDB
 from .schema import EventType
@@ -30,6 +32,8 @@ class CreateEvent(graphene.Mutation):
             "guests_list": guests_list,
             "invites_number": invites_number
         }
+
+
         events_collection.insert_one(nouvelle_soiree)  # Ajout dans MongoDB
         return CreateEvent(success=True, event=nouvelle_soiree)
 
@@ -54,6 +58,8 @@ class Register(graphene.Mutation):
         existing_email = db["users"].find_one(
             {"email": email,},
         )
+
+
         if existing_email:
             raise Exception("Cet email est déjà utilisé.")
 
@@ -96,29 +102,34 @@ class LoginMutation(graphene.Mutation):
         email = graphene.String(required=True)
         password = graphene.String(required=True)
 
+    token = graphene.String()
+    user = graphene.Field(UserType)
     message = graphene.String()
 
     def mutate(self, info, email, password):
-        # Simuler la vérification de l'existence de l'utilisateur
-        print(f"Vérification de l'utilisateur avec l'email : {email}")
-        print(password)
-        user_exists = True  # Supposons que l'utilisateur existe pour cette démonstration
-
-        if not user_exists:
+        # 🔍 Recherche de l'utilisateur dans la base de données
+        user_data = db['users'].find_one({"email": email})
+        if not user_data:
             raise Exception("Utilisateur non trouvé.")
 
-        # Simuler la vérification du mot de passe
-        print(f"Vérification du mot de passe pour l'utilisateur : {email}")
-        password_correct = True  # Supposons que le mot de passe est correct pour cette démonstration
-
-        if not password_correct:
+        # 🔑 Vérification du mot de passe
+        if not check_password_hash(user_data["password"], password):
             raise Exception("Mot de passe incorrect.")
 
-        print("Connexion réussie.")
-        return LoginMutation(message="Connexion réussie.")
+        # 🔥 Génération du token JWT
+        token = create_access_token(identity=str(user_data["_id"]))
 
+        # 📌 Construction de la réponse utilisateur
+        user = UserType(
+            email=user_data["email"],
+            firstName=user_data.get("firstName", "Inconnu")  # Utilise "Inconnu" si firstName n'existe pas
+        )
 
-
+        return LoginMutation(
+            token=token,
+            user=user,
+            message="Connexion réussie."
+        )
 # Fusion des mutations
 class Mutation(graphene.ObjectType):
     register = Register.Field()
