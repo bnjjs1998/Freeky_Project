@@ -18,15 +18,15 @@ class CreateEvent(graphene.Mutation):
     event = graphene.Field(EventType)
 
     def mutate(self, info, name, date, location, guests_list, invites_number):
-        nouvelle_soiree = {
+        new_event = {
             "name": name,
             "date": date,
             "location": location,
             "guests_list": guests_list,
             "invites_number": invites_number
         }
-        events_collection.insert_one(nouvelle_soiree)  # Ajout dans MongoDB
-        return CreateSoiree(success=True, event=nouvelle_soiree)
+        events_collection.insert_one(new_event)  # Ajout dans MongoDB
+        return CreateEvent(success=True, event=nouvelle_soiree)
 
 # Ajouter la mutation au schéma
 class Mutation(ObjectType):
