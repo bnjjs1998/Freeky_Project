@@ -38,7 +38,7 @@ class Query(graphene.ObjectType):
         return list(soirees)  # Conversion en liste pour GraphQL
 
 
-
+## Travail baptiste
 
 # Définition du type GraphQL pour les utilisateurs
 class UserType(graphene.ObjectType):
@@ -119,6 +119,9 @@ class LoginMutation(graphene.Mutation):
 
 
         user = db["users"].find_one({"email": email})
+
+        if not user:
+            raise Exception("l'utilsateur n'existe pas")
 
 
 
