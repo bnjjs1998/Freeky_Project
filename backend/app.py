@@ -68,14 +68,7 @@ class Register(graphene.Mutation):
         # Hash du mot de passe pour la sécurité
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
-        # Sauvegarde dans MongoDB
-        db["users"].insert_one({
-            "FirstName": FirstName,
-            "LastName": LastName,
-            "birthday": birthday,
-            "email": email,
-            "password": hashed_password.decode('utf-8')  # Stocker en texte lisible
-        })
+
 
         return Register(user=UserType(
             FirstName=FirstName,
@@ -97,6 +90,7 @@ class LoginMutation(graphene.Mutation):
     def mutate(self, info, email, password):
         # Simuler la vérification de l'existence de l'utilisateur
         print(f"Vérification de l'utilisateur avec l'email : {email}")
+        print(password)
         user_exists = True  # Supposons que l'utilisateur existe pour cette démonstration
 
         if not user_exists:
