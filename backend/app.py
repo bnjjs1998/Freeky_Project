@@ -1,27 +1,48 @@
-from flask import Flask
+from flask import Flask, request, jsonify
 from flask_cors import CORS
+import graphene
+from flask_jwt_extended import JWTManager
+from graphene import Schema
+from graphql_folder.schema import Query
+from graphql_folder.mutations import Mutation
+
 
 app = Flask(__name__)
 
+# 🔥 Configuration du secret key pour JWT
+app.config["JWT_SECRET_KEY"] = "votre_cle_secrete"  # Remplacez par une clé sécurisée
+
+#Initialisation de JWTManager
+jwt = JWTManager(app)
+
 #autoriser le cors uniquement sur l'url local de react
-CORS(app, origins=["http://localhost:5173"])
+CORS(app)
 
-class Query(graphene.ObjectType):
-    hello = graphene.String()
+# Définition du schéma GraphQL
+schema = Schema(query=Query, mutation=Mutation)
 
-    def resolve_hello(self, info):
-        return "Bienvenue sur le site d'hébergement de soirées !"
+@app.route("/graphql", methods=["POST"])
+def graphql_server():
+    data = request.get_json()
+    if not data or "query" not in data:
+        return jsonify({"error": "Requête invalide"}), 400
+    result = schema.execute(data["query"])
+    if result.errors:
+        return jsonify({"errors": [str(error) for error in result.errors]})
+    return jsonify(result.data)
 
-schema = graphene.Schema(query=Query)
+# app.add_url_rule(
+#     "/graphql",
+#     view_func=GraphQLView.as_view("graphql", schema=schema, graphiql=True),
+# )
 
-app.add_url_rule(
-    "/graphql", view_func=GraphQLView.as_view("graphql", schema=schema, graphiql=True)
-)
-
+# Route GraphQL
 @app.route('/')
 def hello_world():  # put application's code here
-    return 'Hello World!'
+    return {"message": "API Flask + GraphQL + MongoDB is ok !",
+        # "events": events
+    }
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
