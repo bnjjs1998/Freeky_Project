@@ -1,18 +1,37 @@
 import graphene
-from graphene import ObjectType, String, List, Int
+from graphene import ObjectType, String, List, Int, Field
 from database import events_collection  # Import de la connexion MongoDB
 
 # Définition du modèle GraphQL
 class EventType(ObjectType):
-    nom = String()
+    id = graphene.String()
+    name = String()
+    description = String()
     date = String()
-    lieu = String()
+    location = String()
     guests_list = List(String)
     invites_number = Int()
 
+# Définition du type GraphQL pour les utilisateurs
+class UserType(graphene.ObjectType):
+    id = graphene.String()
+    firstName = graphene.String()
+    lastName = graphene.String()
+    birthdate = graphene.String()
+
+
 # Query GraphQL
 class Query(ObjectType):
-    events = List(EventType)
+    users = List(UserType)
+    def resolve_users(self, info):
+        return list(users_collection.find({}, {"_id": 0}))  # Récupération des utilisateurs depuis MongoDB
 
-    def resolve_soirees(self, info):
+    events = List(EventType)
+    def resolve_events(self, info):
         return list(events_collection.find({}, {"_id": 0}))
+
+    event = Field(EventType, id=String())
+    def resolve_event(self, info, id):
+        return events_collection.find_one({"_id": ObjectId(id)})
+
+    email = graphene.String()

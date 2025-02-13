@@ -14,6 +14,16 @@ CORS(app)
 # Définition du schéma GraphQL
 schema = Schema(query=Query, mutation=Mutation)
 
+@app.route("/graphql", methods=["POST"])
+def graphql_server():
+    data = request.get_json()
+    if not data or "query" not in data:
+        return jsonify({"error": "Requête invalide"}), 400
+    result = schema.execute(data["query"])
+    if result.errors:
+        return jsonify({"errors": [str(error) for error in result.errors]})
+    return jsonify(result.data)
+
 # app.add_url_rule(
 #     "/graphql",
 #     view_func=GraphQLView.as_view("graphql", schema=schema, graphiql=True),
@@ -22,7 +32,9 @@ schema = Schema(query=Query, mutation=Mutation)
 # Route GraphQL
 @app.route('/')
 def hello_world():  # put application's code here
-    return {"message": "API Flask + GraphQL + MongoDB is ok !"}
+    return {"message": "API Flask + GraphQL + MongoDB is ok !",
+        # "events": events
+    }
 
 
 if __name__ == '__main__':
