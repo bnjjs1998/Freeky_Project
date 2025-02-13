@@ -12,7 +12,7 @@ Ce projet utilise les technologies suivantes :
 - **TypeScript** pour un typage robuste
 - **React Router** pour la navigation entre les pages
 - **SASS (SCSS)** pour des styles personnalisés et organisés
-- [Ajoute d'autres technologies ici, si besoin]
+
 
 ---
 
