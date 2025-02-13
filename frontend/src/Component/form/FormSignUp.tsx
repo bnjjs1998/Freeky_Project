@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import InputField from '../input/InputField';
 
 interface FormData {
-    FirstName: string;
-    LastName: string;
+    firstName: string;
+    lastName: string;
     email: string;
     password: string;
     birthdate: string;
@@ -12,8 +12,8 @@ interface FormData {
 
 const FormSignUp: React.FC = () => {
     const [formData, setFormData] = useState<FormData>({
-        FirstName: '',
-        LastName: '',
+        firstName: '',
+        lastName: '',
         email: '',
         password: '',
         birthdate: ''
@@ -31,8 +31,8 @@ const FormSignUp: React.FC = () => {
 
     const isFormValid = () => {
         if (
-            !formData.FirstName ||
-            !formData.LastName ||
+            !formData.firstName ||
+            !formData.lastName ||
             !formData.email ||
             !formData.password ||
             !formData.birthdate
@@ -58,20 +58,20 @@ const FormSignUp: React.FC = () => {
     };
 
     const fetchData = async () => {
-        const formattedBirthday = new Date(formData.birthdate).toISOString().split("T")[0];
+        const formattedBirthdate = new Date(formData.birthdate).toISOString().split("T")[0];
 
         const query = `
             mutation {
                 register(
-                    FirstName: "${formData.FirstName}",
-                    LastName: "${formData.LastName}",
-                    birthdate: "${formattedBirthday}",
+                    firstName: "${formData.firstName}",
+                    lastName: "${formData.lastName}",
+                    birthdate: "${formattedBirthdate}",
                     email: "${formData.email}",
                     password: "${formData.password}"
                 ) {
                     user {
-                        FirstName
-                        LastName
+                        firstName
+                        lastName
                         birthdate
                         email
                     }
@@ -96,9 +96,7 @@ const FormSignUp: React.FC = () => {
 
             console.log("Réponse GraphQL:", result);
 
-            if (result.data.register.user) {
-                alert("Utilisateur créé avec succès !");
-            }
+            
         } catch (error) {
             console.error("Erreur lors de la requête:", error);
             alert("Une erreur est survenue lors de l'inscription.");
@@ -110,16 +108,16 @@ const FormSignUp: React.FC = () => {
             <InputField
                 label="First Name"
                 type="text"
-                name="FirstName"
-                value={formData.FirstName}
-                onChange={(value) => handleChange('FirstName', value)}
+                name="firstName"
+                value={formData.firstName}
+                onChange={(value) => handleChange('firstName', value)}
             />
             <InputField
                 label="Last Name"
                 type="text"
-                name="LastName"
-                value={formData.LastName}
-                onChange={(value) => handleChange('LastName', value)}
+                name="lastName"
+                value={formData.lastName}
+                onChange={(value) => handleChange('lastName', value)}
             />
             <InputField
                 label="Email"

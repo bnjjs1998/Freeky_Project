@@ -1,11 +1,16 @@
+from datetime import datetime, date
+
+import bcrypt
 import graphene
 from graphene import ObjectType, String, Field, Boolean
-from database import events_collection  # Import de la connexion MongoDB
-from graphql_folder.schema import EventType  # Import du modèle GraphQL
-from graphql_folder.schema import UserType  # Import du modèle GraphQL
-from graphql_folder.schema import Query
+ # Import de la connexion MongoDB
+from .schema import EventType
+from .schema import UserType
+from .schema import Query
+from backend import database
+from backend.database import events_collection, db
 
-# Mutation pour ajouter une soirée
+
 class CreateEvent(graphene.Mutation):
     class Arguments:
         name = graphene.String(required=True)
@@ -26,7 +31,7 @@ class CreateEvent(graphene.Mutation):
             "invites_number": invites_number
         }
         events_collection.insert_one(nouvelle_soiree)  # Ajout dans MongoDB
-        return CreateSoiree(success=True, event=nouvelle_soiree)
+        return CreateEvent(success=True, event=nouvelle_soiree)
 
 # Ajouter la mutation au schéma
 class Mutation(ObjectType):
@@ -43,18 +48,34 @@ class Register(graphene.Mutation):
 
     user = graphene.Field(UserType)
 
-    def mutate(self, info, FirstName, LastName, birthdate, email, password):
+    def mutate(self, info, firstName, lastName, birthdate, email, password):
+        print(firstName, lastName, birthdate, email, password)
         # Vérifier si l'email existe déjà
-        existing_user = db["users"].find_one({"email": email})
-        if existing_user:
+        existing_email = db["users"].find_one(
+            {"email": email,},
+        )
+        if existing_email:
             raise Exception("Cet email est déjà utilisé.")
+
+        # Convertir la date reçue en un objet datetime
+        date_naissance = datetime.strptime(birthdate, "%Y-%m-%d").date()
+
+        # Calculer l'âge
+        aujourd_hui = date.today()
+        age = aujourd_hui.year - date_naissance.year - (
+                (aujourd_hui.month, aujourd_hui.day) < (date_naissance.month, date_naissance.day)
+                )
+
+        # Vérifier si l'utilisateur est majeur
+        if age < 18:
+            raise Exception("L'utilisateur doit être majeur pour s'inscrire.")
 
         # Hash du mot de passe pour la sécurité
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
         # Créer le nouvel utilisateur
         new_user = {
-            "lirstName": firstName,
+            "firstName": firstName,
             "lastName": lastName,
             "birthdate": birthdate,
             "email": email,
