@@ -68,6 +68,17 @@ class Register(graphene.Mutation):
         # Hash du mot de passe pour la sécurité
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
+        # Créer le nouvel utilisateur
+        new_user = {
+            "FirstName": FirstName,
+            "LastName": LastName,
+            "birthday": birthday,
+            "email": email,
+            "password": hashed_password.decode('utf-8')
+        }
+
+        db["users"].insert_one(new_user)
+
 
 
         return Register(user=UserType(
