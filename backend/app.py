@@ -24,6 +24,10 @@ def graphql_server():
         return jsonify({"errors": [str(error) for error in result.errors]})
     return jsonify(result.data)
 
+# app.add_url_rule(
+#     "/graphql",
+#     view_func=GraphQLView.as_view("graphql", schema=schema, graphiql=True),
+# )
 
 # Route GraphQL
 @app.route('/')

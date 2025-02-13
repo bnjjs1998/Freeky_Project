@@ -5,7 +5,6 @@ from graphql_folder.schema import EventType  # Import du modèle GraphQL
 from graphql_folder.schema import UserType  # Import du modèle GraphQL
 from graphql_folder.schema import Query
 
-
 # Mutation pour ajouter une soirée
 class CreateEvent(graphene.Mutation):
     class Arguments:
@@ -36,8 +35,8 @@ class Mutation(ObjectType):
 # Mutation pour l'enregistrement d'un utilisateur
 class Register(graphene.Mutation):
     class Arguments:
-        FirstName = graphene.String(required=True)
-        LastName = graphene.String(required=True)
+        firstName = graphene.String(required=True)
+        lastName = graphene.String(required=True)
         birthday = graphene.String(required=True)
         email = graphene.String(required=True)
         password = graphene.String(required=True)
@@ -55,8 +54,8 @@ class Register(graphene.Mutation):
 
         # Créer le nouvel utilisateur
         new_user = {
-            "FirstName": FirstName,
-            "LastName": LastName,
+            "lirstName": firstName,
+            "lastName": lastName,
             "birthday": birthday,
             "email": email,
             "password": hashed_password.decode('utf-8')
@@ -65,8 +64,8 @@ class Register(graphene.Mutation):
         db["users"].insert_one(new_user)
 
         return Register(user=UserType(
-            FirstName=FirstName,
-            LastName=LastName,
+            firstName=firstName,
+            lastName=lastName,
             birthday=birthday,
             email=email
         ))
