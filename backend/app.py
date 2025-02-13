@@ -1,4 +1,5 @@
 from datetime import datetime
+from datetime import date
 import bcrypt
 import graphene
 from flask_graphql import GraphQLView
@@ -59,11 +60,28 @@ class Register(graphene.Mutation):
 
     user = graphene.Field(UserType)
 
-    def mutate(self, info, FirstName, LastName, birthday, email, password):
+
+
+    def mutate(self, info, FirstName, LastName, birthdate, email, password):
         # Vérifier si l'email existe déjà
-        existing_user = db["users"].find_one({"email": email})
-        if existing_user:
+        existing_email = db["users"].find_one(
+            {"email": email,},
+        )
+        if existing_email:
             raise Exception("Cet email est déjà utilisé.")
+
+        # Convertir la date reçue en un objet datetime
+        date_naissance = datetime.strptime(birthdate, "%Y-%m-%d").date()
+
+        # Calculer l'âge
+        aujourd_hui = date.today()
+        age = aujourd_hui.year - date_naissance.year - (
+                (aujourd_hui.month, aujourd_hui.day) < (date_naissance.month, date_naissance.day)
+                )
+
+        # Vérifier si l'utilisateur est majeur
+        if age < 18:
+            raise Exception("L'utilisateur doit être majeur pour s'inscrire.")
 
         # Hash du mot de passe pour la sécurité
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
@@ -72,19 +90,15 @@ class Register(graphene.Mutation):
         new_user = {
             "FirstName": FirstName,
             "LastName": LastName,
-            "birthday": birthday,
+            "birthdate": birthdate,
             "email": email,
             "password": hashed_password.decode('utf-8')
         }
-
         db["users"].insert_one(new_user)
-
-
-
         return Register(user=UserType(
             FirstName=FirstName,
             LastName=LastName,
-            birthday=birthday,
+            birthdate=birthdate,
             email=email
         ))
 
@@ -102,17 +116,11 @@ class LoginMutation(graphene.Mutation):
         # Simuler la vérification de l'existence de l'utilisateur
         print(f"Vérification de l'utilisateur avec l'email : {email}")
         print(password)
-        user_exists = True  # Supposons que l'utilisateur existe pour cette démonstration
 
-        if not user_exists:
-            raise Exception("Utilisateur non trouvé.")
 
-        # Simuler la vérification du mot de passe
-        print(f"Vérification du mot de passe pour l'utilisateur : {email}")
-        password_correct = True  # Supposons que le mot de passe est correct pour cette démonstration
+        user = db["users"].find_one({"email": email})
 
-        if not password_correct:
-            raise Exception("Mot de passe incorrect.")
+
 
         print("Connexion réussie.")
         return LoginMutation(message="Connexion réussie.")
