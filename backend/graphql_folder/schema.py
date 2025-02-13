@@ -1,4 +1,5 @@
 import graphene
+from bson import ObjectId
 from graphene import ObjectType, String, List, Int, Field
 from database import events_collection  # Import de la connexion MongoDB
 
@@ -17,6 +18,7 @@ class UserType(graphene.ObjectType):
     firstName = graphene.String()
     lastName = graphene.String()
     birthdate = graphene.String()
+    email = graphene.String()
 
 
 # Query GraphQL

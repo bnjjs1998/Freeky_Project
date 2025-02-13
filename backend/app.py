@@ -1,12 +1,19 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import graphene
+from flask_jwt_extended import JWTManager
 from graphene import Schema
 from graphql_folder.schema import Query
 from graphql_folder.mutations import Mutation
 
 
 app = Flask(__name__)
+
+# 🔥 Configuration du secret key pour JWT
+app.config["JWT_SECRET_KEY"] = "votre_cle_secrete"  # Remplacez par une clé sécurisée
+
+#Initialisation de JWTManager
+jwt = JWTManager(app)
 
 #autoriser le cors uniquement sur l'url local de react
 CORS(app)

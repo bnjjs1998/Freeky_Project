@@ -1,11 +1,18 @@
-import graphene
-from graphene import ObjectType, String, Field, Boolean
-from database import events_collection  # Import de la connexion MongoDB
-from graphql_folder.schema import EventType  # Import du modèle GraphQL
-from graphql_folder.schema import UserType  # Import du modèle GraphQL
-from graphql_folder.schema import Query
+from datetime import datetime, date
 
-# Mutation pour ajouter une soirée
+import bcrypt
+import graphene
+from flask_bcrypt import check_password_hash
+from flask_jwt_extended import create_access_token
+from graphene import ObjectType, String, Field, Boolean
+ # Import de la connexion MongoDB
+from .schema import EventType
+from .schema import UserType
+from .schema import Query
+from backend import database
+from backend.database import events_collection, db
+
+
 class CreateEvent(graphene.Mutation):
     class Arguments:
         name = graphene.String(required=True)
@@ -25,8 +32,10 @@ class CreateEvent(graphene.Mutation):
             "guests_list": guests_list,
             "invites_number": invites_number
         }
+
+
         events_collection.insert_one(nouvelle_soiree)  # Ajout dans MongoDB
-        return CreateSoiree(success=True, event=nouvelle_soiree)
+        return CreateEvent(success=True, event=nouvelle_soiree)
 
 # Ajouter la mutation au schéma
 class Mutation(ObjectType):
@@ -37,26 +46,44 @@ class Register(graphene.Mutation):
     class Arguments:
         firstName = graphene.String(required=True)
         lastName = graphene.String(required=True)
-        birthday = graphene.String(required=True)
+        birthdate = graphene.String(required=True)
         email = graphene.String(required=True)
         password = graphene.String(required=True)
 
     user = graphene.Field(UserType)
 
-    def mutate(self, info, FirstName, LastName, birthday, email, password):
+    def mutate(self, info, firstName, lastName, birthdate, email, password):
+        print(firstName, lastName, birthdate, email, password)
         # Vérifier si l'email existe déjà
-        existing_user = db["users"].find_one({"email": email})
-        if existing_user:
+        existing_email = db["users"].find_one(
+            {"email": email,},
+        )
+
+
+        if existing_email:
             raise Exception("Cet email est déjà utilisé.")
+
+        # Convertir la date reçue en un objet datetime
+        date_naissance = datetime.strptime(birthdate, "%Y-%m-%d").date()
+
+        # Calculer l'âge
+        aujourd_hui = date.today()
+        age = aujourd_hui.year - date_naissance.year - (
+                (aujourd_hui.month, aujourd_hui.day) < (date_naissance.month, date_naissance.day)
+                )
+
+        # Vérifier si l'utilisateur est majeur
+        if age < 18:
+            raise Exception("L'utilisateur doit être majeur pour s'inscrire.")
 
         # Hash du mot de passe pour la sécurité
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
         # Créer le nouvel utilisateur
         new_user = {
-            "lirstName": firstName,
+            "firstName": firstName,
             "lastName": lastName,
-            "birthday": birthday,
+            "birthdate": birthdate,
             "email": email,
             "password": hashed_password.decode('utf-8')
         }
@@ -66,7 +93,7 @@ class Register(graphene.Mutation):
         return Register(user=UserType(
             firstName=firstName,
             lastName=lastName,
-            birthday=birthday,
+            birthdate=birthdate,
             email=email
         ))
 
@@ -75,29 +102,34 @@ class LoginMutation(graphene.Mutation):
         email = graphene.String(required=True)
         password = graphene.String(required=True)
 
+    token = graphene.String()
+    user = graphene.Field(UserType)
     message = graphene.String()
 
     def mutate(self, info, email, password):
-        # Simuler la vérification de l'existence de l'utilisateur
-        print(f"Vérification de l'utilisateur avec l'email : {email}")
-        print(password)
-        user_exists = True  # Supposons que l'utilisateur existe pour cette démonstration
-
-        if not user_exists:
+        # 🔍 Recherche de l'utilisateur dans la base de données
+        user_data = db['users'].find_one({"email": email})
+        if not user_data:
             raise Exception("Utilisateur non trouvé.")
 
-        # Simuler la vérification du mot de passe
-        print(f"Vérification du mot de passe pour l'utilisateur : {email}")
-        password_correct = True  # Supposons que le mot de passe est correct pour cette démonstration
-
-        if not password_correct:
+        # 🔑 Vérification du mot de passe
+        if not check_password_hash(user_data["password"], password):
             raise Exception("Mot de passe incorrect.")
 
-        print("Connexion réussie.")
-        return LoginMutation(message="Connexion réussie.")
+        # 🔥 Génération du token JWT
+        token = create_access_token(identity=str(user_data["_id"]))
 
+        # 📌 Construction de la réponse utilisateur
+        user = UserType(
+            email=user_data["email"],
+            firstName=user_data.get("firstName", "Inconnu")  # Utilise "Inconnu" si firstName n'existe pas
+        )
 
-
+        return LoginMutation(
+            token=token,
+            user=user,
+            message="Connexion réussie."
+        )
 # Fusion des mutations
 class Mutation(graphene.ObjectType):
     register = Register.Field()
