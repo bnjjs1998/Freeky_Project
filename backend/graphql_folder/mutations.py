@@ -37,13 +37,13 @@ class Register(graphene.Mutation):
     class Arguments:
         firstName = graphene.String(required=True)
         lastName = graphene.String(required=True)
-        birthday = graphene.String(required=True)
+        birthdate = graphene.String(required=True)
         email = graphene.String(required=True)
         password = graphene.String(required=True)
 
     user = graphene.Field(UserType)
 
-    def mutate(self, info, FirstName, LastName, birthday, email, password):
+    def mutate(self, info, FirstName, LastName, birthdate, email, password):
         # Vérifier si l'email existe déjà
         existing_user = db["users"].find_one({"email": email})
         if existing_user:
@@ -56,7 +56,7 @@ class Register(graphene.Mutation):
         new_user = {
             "lirstName": firstName,
             "lastName": lastName,
-            "birthday": birthday,
+            "birthdate": birthdate,
             "email": email,
             "password": hashed_password.decode('utf-8')
         }
@@ -66,7 +66,7 @@ class Register(graphene.Mutation):
         return Register(user=UserType(
             firstName=firstName,
             lastName=lastName,
-            birthday=birthday,
+            birthdate=birthdate,
             email=email
         ))
 
