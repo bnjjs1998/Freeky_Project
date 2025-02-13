@@ -7,7 +7,7 @@ interface FormData {
     LastName: string;
     email: string;
     password: string;
-    birthday: string;
+    birthdate: string;
 }
 
 const FormSignUp: React.FC = () => {
@@ -16,7 +16,7 @@ const FormSignUp: React.FC = () => {
         LastName: '',
         email: '',
         password: '',
-        birthday: ''
+        birthdate: ''
     });
 
     const [error, setError] = useState('');
@@ -35,7 +35,7 @@ const FormSignUp: React.FC = () => {
             !formData.LastName ||
             !formData.email ||
             !formData.password ||
-            !formData.birthday
+            !formData.birthdate
         ) {
             setError('All fields are required!');
             return false;
@@ -58,21 +58,21 @@ const FormSignUp: React.FC = () => {
     };
 
     const fetchData = async () => {
-        const formattedBirthday = new Date(formData.birthday).toISOString().split("T")[0];
+        const formattedBirthday = new Date(formData.birthdate).toISOString().split("T")[0];
 
         const query = `
             mutation {
                 register(
                     FirstName: "${formData.FirstName}",
                     LastName: "${formData.LastName}",
-                    birthday: "${formattedBirthday}",
+                    birthdate: "${formattedBirthday}",
                     email: "${formData.email}",
                     password: "${formData.password}"
                 ) {
                     user {
                         FirstName
                         LastName
-                        birthday
+                        birthdate
                         email
                     }
                 }
@@ -136,11 +136,11 @@ const FormSignUp: React.FC = () => {
                 onChange={(value) => handleChange('password', value)}
             />
             <InputField
-                label="Birthday"
+                label="birthdate"
                 type="date"
-                name="birthday"
-                value={formData.birthday}
-                onChange={(value) => handleChange('birthday', value)}
+                name="birthdate"
+                value={formData.birthdate}
+                onChange={(value) => handleChange('birthdate', value)}
             />
             {error && <p style={{ color: 'red' }}>{error}</p>}
             <button type="submit">Submit</button>
