@@ -17,12 +17,11 @@ class CreateEvent(graphene.Mutation):
     success = graphene.Boolean()
     event = graphene.Field(EventType)
 
-    def mutate(self, info, name, date, location, guests_list, invites_number):
+    def mutate(self, info, name, date, location, invites_number):
         new_event = {
             "name": name,
             "date": date,
             "location": location,
-            "guests_list": guests_list,
             "invites_number": invites_number
         }
         events_collection.insert_one(new_event)  # Ajout dans MongoDB
