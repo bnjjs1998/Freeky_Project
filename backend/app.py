@@ -1,32 +1,21 @@
 from datetime import datetime
-
 import bcrypt
 import graphene
 from flask_graphql import GraphQLView
-
 from flask import Flask
 from flask_cors import CORS
-import graphene
-from graphene import ObjectType, String, List, Schema
-from flask_graphql import GraphQLView
 from pymongo import MongoClient
-from Register import *
 
 app = Flask(__name__)
 
-#autoriser le cors uniquement sur l'url local de react
+# Autoriser le CORS uniquement sur l'URL local de React
 CORS(app, origins=["http://localhost:5173"])
 
-
+# Connexion à la base MongoDB
 client = MongoClient("mongodb://localhost:27017/")
 db = client["freeky_db"]  # Nom de la base de données
 
-# # Création de la collection
-# users = db["users"]  # Nom de la collection
 
-# users.insert_one({"name": "John", "lastname": "Doe", "email": "jd@mail.com" })"
-# # Création de la collection
-# event
 
 
 # Définition du type GraphQL pour les soirées
@@ -36,23 +25,30 @@ class SoireeType(graphene.ObjectType):
     date = graphene.String()
     lieu = graphene.String()
 
+
+
+
 # Définition de la Query pour récupérer les soirées
 class Query(graphene.ObjectType):
     soirees = graphene.List(SoireeType)
 
     def resolve_soirees(self, info):
-        return list(db["soirees"].find({}, {"_id": 0}))  # Récupère toutes les soirées
-
-# Définition du schéma GraphQL
-schema = graphene.Schema(query=Query)
+        soirees = db["soirees"].find({}, {"_id": 0})  # Exclut l'ID MongoDB
+        return list(soirees)  # Conversion en liste pour GraphQL
 
 
+
+
+# Définition du type GraphQL pour les utilisateurs
 class UserType(graphene.ObjectType):
     FirstName = graphene.String()
     LastName = graphene.String()
     birthday = graphene.String()
     email = graphene.String()
 
+
+
+# Mutation pour l'enregistrement d'un utilisateur
 class Register(graphene.Mutation):
     class Arguments:
         FirstName = graphene.String(required=True)
@@ -64,12 +60,22 @@ class Register(graphene.Mutation):
     user = graphene.Field(UserType)
 
     def mutate(self, info, FirstName, LastName, birthday, email, password):
-        print("Nouvel utilisateur enregistré :")
-        print(f"Prénom: {FirstName}")
-        print(f"Nom: {LastName}")
-        print(f"Date de naissance: {birthday}")
-        print(f"Email: {email}")
-        print(f"Mot de passe: (non affiché pour la sécurité) {password} ")
+        # Vérifier si l'email existe déjà
+        existing_user = db["users"].find_one({"email": email})
+        if existing_user:
+            raise Exception("Cet email est déjà utilisé.")
+
+        # Hash du mot de passe pour la sécurité
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+
+        # Sauvegarde dans MongoDB
+        db["users"].insert_one({
+            "FirstName": FirstName,
+            "LastName": LastName,
+            "birthday": birthday,
+            "email": email,
+            "password": hashed_password.decode('utf-8')  # Stocker en texte lisible
+        })
 
         return Register(user=UserType(
             FirstName=FirstName,
@@ -78,12 +84,43 @@ class Register(graphene.Mutation):
             email=email
         ))
 
-# Définition du schéma GraphQL
+
+
+
+
+# Mutation pour la connexion d'un utilisateur
+class LoginMutation(graphene.Mutation):
+    class Arguments:
+        email = graphene.String(required=True)
+        password = graphene.String(required=True)
+
+    message = graphene.String()
+
+    def mutate(self, info, email, password):
+        # Vérifier si l'utilisateur existe
+        user = db["users"].find_one({"email": email})
+        if not user:
+            raise Exception("Utilisateur non trouvé.")
+
+        # Vérifier le mot de passe
+        if not bcrypt.checkpw(password.encode('utf-8'), user["password"].encode('utf-8')):
+            raise Exception("Mot de passe incorrect.")
+
+        return LoginMutation(message="Connexion réussie.")
+
+
+
+
+# Fusion des mutations
 class Mutation(graphene.ObjectType):
     register = Register.Field()
+    login = LoginMutation.Field()
 
-# Définition du schéma GraphQL
-schema = graphene.Schema(mutation=Mutation)
+
+
+# Définition du schéma GraphQL (Query + Mutation)
+schema = graphene.Schema(query=Query, mutation=Mutation)
+
 
 
 # Ajout de la route GraphQL
@@ -92,11 +129,9 @@ app.add_url_rule(
     view_func=GraphQLView.as_view("graphql", schema=schema, graphiql=True),
 )
 
-
 @app.route('/')
-def hello_world():  # put application's code here
+def hello_world():
     return {"message": "API Flask + GraphQL + MongoDB is ok !"}
-
 
 if __name__ == '__main__':
     app.run(debug=True)
