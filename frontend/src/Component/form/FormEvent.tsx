@@ -6,7 +6,7 @@ interface Event {
     description: string;
     date: string;
     location: string;
-    invites_number: number;
+    invitesNumber: number;  // 🔹 Correction : camelCase pour matcher le backend
 }
 
 const FormEvent: React.FC = () => {
@@ -15,7 +15,7 @@ const FormEvent: React.FC = () => {
         description: '',
         date: '',
         location: '',
-        invites_number: 0,
+        invitesNumber: 0,
     });
 
     // Gestion des changements de champs
@@ -23,7 +23,7 @@ const FormEvent: React.FC = () => {
         const { name, value } = e.target;
         setEventData((prevState) => ({
             ...prevState,
-            [name]: name === 'invites_number' ? parseInt(value, 10) : value, // Conversion en entier pour invites_number
+            [name]: name === 'invitesNumber' ? parseInt(value, 10) : value, // Conversion en entier pour invitesNumber
         }));
     };
 
@@ -34,27 +34,29 @@ const FormEvent: React.FC = () => {
 
         // Mutation GraphQL pour créer un événement
         const query = `
-      mutation {
-        createEvent(
-          name: "${eventData.name}",
-          description: "${eventData.description}",
-          date: "${eventData.date}",
-          location: "${eventData.location}",
-          invites_number: ${eventData.invites_number}
-        ) {
-          id
-          name
-          description
-          date
-          location
-          invites_number
+        mutation {
+            createEvent(
+                name: "${eventData.name}",
+                description: "${eventData.description}",
+                date: "${eventData.date}",
+                location: "${eventData.location}",
+                invitesNumber: ${eventData.invitesNumber}
+            ) {
+                success
+                event {
+                    name
+                    description
+                    date
+                    location
+                    invitesNumber
+                }
+            }
         }
-      }
     `;
-
+        
         // Requête fetch pour envoyer la mutation GraphQL
         try {
-            const response = await fetch('http://localhost:5000/graphql', {
+            const response = await fetch('http://localhost:5001/graphql', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ query }),
@@ -67,7 +69,7 @@ const FormEvent: React.FC = () => {
                 return;
             }
 
-            console.log("Réponse GraphQL :", result.data.createEvent);
+            console.log("Réponse GraphQL :", result.event);
             alert("Événement créé avec succès !");
         } catch (error) {
             console.error("Erreur lors de la requête :", error);
@@ -80,7 +82,7 @@ const FormEvent: React.FC = () => {
             <h2> create event</h2>
             <form onSubmit={handleSubmit}>
                 <div>
-                    <label>Nom de l'événement :</label>
+                    <label>Event title :</label>
                     <input
                         type="text"
                         name="name"
@@ -123,13 +125,13 @@ const FormEvent: React.FC = () => {
                     <label>guest number :</label>
                     <input
                         type="number"
-                        name="invites_number"
-                        value={eventData.invites_number}
+                        name="invitesNumber"
+                        value={eventData.invitesNumber}
                         onChange={handleInputChange}
                     />
                 </div>
 
-                <button type="submit">create my party</button>
+                <button type="submit">create my event</button>
             </form>
         </div>
     );
