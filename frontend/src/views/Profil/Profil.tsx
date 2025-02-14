@@ -1,14 +1,22 @@
 import React from 'react'
 import FormEvent from '../../Component/form/FormEvent'
+import { useNavigate } from 'react-router-dom'
 
 
 function Profil({ }: any) {
+    const navigate = useNavigate()
+    const handleRedirect = () => {
+        navigate('/Events')
+    }
     return (
         <>
-            <h1>hello user </h1>
+            <button onClick={handleRedirect}>Back</button>
+            <div>
 
-            <h6>create event</h6>
+            <h1>All Events list</h1>
+            {/* <h6>create event</h6> */}
             <FormEvent />
+            </div>
         </>
     )
 }

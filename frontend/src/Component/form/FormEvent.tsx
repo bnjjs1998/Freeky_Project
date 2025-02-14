@@ -79,7 +79,7 @@ const FormEvent: React.FC = () => {
 
     return (
         <div>
-            <h2> create event</h2>
+            {/* <h2> create event</h2> */}
             <form onSubmit={handleSubmit}>
                 <div>
                     <label>Event title :</label>
