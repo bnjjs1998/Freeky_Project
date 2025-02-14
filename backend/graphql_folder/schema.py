@@ -9,14 +9,15 @@ class EventType(ObjectType):
     description = String()
     date = String()
     location = String()
-    guests_list = List(String)
-    invites_number = Int()
+    guestsList = List(String)
+    invitesNumber = Int()
 # Définition du type GraphQL pour les utilisateurs
 class UserType(graphene.ObjectType):
     id = graphene.String()
     firstName = graphene.String()
     lastName = graphene.String()
     birthdate = graphene.String()
+    email = graphene.String()
 
 
 # Query GraphQL
