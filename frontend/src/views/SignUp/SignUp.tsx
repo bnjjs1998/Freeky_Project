@@ -1,6 +1,7 @@
 import React from 'react'
 
 import FormSignUp from '../../Component/form/FormSignUp'
+import './SignUp.scss'
 
 
 

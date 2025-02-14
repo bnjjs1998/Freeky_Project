@@ -1,4 +1,5 @@
 import graphene
+from bson import ObjectId
 from graphene import ObjectType, String, List, Int, Field
 from database import events_collection  # Import de la connexion MongoDB
 
