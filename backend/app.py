@@ -35,7 +35,7 @@ def graphql_server():
     if result.errors:
         return jsonify({"errors": [str(error) for error in result.errors]})
     
-    return _corsify_actual_response(jsonify(result.data))
+    return _corsify_actual_response(jsonify({"data": result.data}))
 
 # Réponse CORS pour les requêtes pré-vol
 @app.before_request
