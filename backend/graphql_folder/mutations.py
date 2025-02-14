@@ -5,7 +5,7 @@ from flask_bcrypt import check_password_hash
 from flask_jwt_extended import create_access_token
 from database import events_collection  # Import de la connexion MongoDB
 from graphql_folder.schema import EventType, UserType  # Import des modèles GraphQL
-from backend.database import db
+from database import db
 import bcrypt
 
 # Mutation pour ajouter un événement
