@@ -13,8 +13,7 @@ function Profil({ }: any) {
             <button onClick={handleRedirect}>Back</button>
             <div>
 
-            <h1>All Events list</h1>
-            {/* <h6>create event</h6> */}
+            <h1>Create your event</h1>
             <FormEvent />
             </div>
         </>

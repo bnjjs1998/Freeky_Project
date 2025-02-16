@@ -42,8 +42,8 @@ class CreateEvent(graphene.Mutation):
 # Mutation pour l'enregistrement d'un utilisateur
 class Register(graphene.Mutation):
     class Arguments:
-        first_name = graphene.String(required=True)
-        last_name = graphene.String(required=True)
+        firstName = graphene.String(required=True)
+        lastName = graphene.String(required=True)
         birthdate = graphene.String(required=True)
         email = graphene.String(required=True)
         password = graphene.String(required=True)
@@ -80,8 +80,8 @@ class Register(graphene.Mutation):
 
         # Créer le nouvel utilisateur
         new_user = {
-            "first_name": first_name,
-            "last_name": last_name,
+            "firstName": firstName,
+            "lastName": lastName,
             "birthdate": birthdate,
             "email": email,
             "password": hashed_password.decode('utf-8')
@@ -89,8 +89,8 @@ class Register(graphene.Mutation):
         db["users"].insert_one(new_user)
 
         return Register(user=UserType(
-            first_name=first_name,
-            last_name=last_name,
+            firstName=firstName,
+            lastName=lastName,
             birthdate=birthdate,
             email=email
         ))
