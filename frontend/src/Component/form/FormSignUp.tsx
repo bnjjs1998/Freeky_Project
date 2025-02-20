@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import InputField from '../input/InputField';
+import './FormSignUp.scss'
 
 interface FormData {
     firstName: string;
@@ -80,7 +81,7 @@ const FormSignUp: React.FC = () => {
         `;
 
         try {
-            const response = await fetch("http://localhost:5000/graphql", {
+            const response = await fetch("http://localhost:5001/graphql", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ query }),
@@ -96,7 +97,7 @@ const FormSignUp: React.FC = () => {
 
             console.log("Réponse GraphQL:", result);
 
-            
+
         } catch (error) {
             console.error("Erreur lors de la requête:", error);
             alert("Une erreur est survenue lors de l'inscription.");

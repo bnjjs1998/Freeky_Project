@@ -13,7 +13,6 @@ Ce projet utilise les technologies suivantes :
 - **React Router** pour la navigation entre les pages
 - **SASS (SCSS)** pour des styles personnalisés et organisés
 
-
 ---
 
 ## 📂 Architecture du projet

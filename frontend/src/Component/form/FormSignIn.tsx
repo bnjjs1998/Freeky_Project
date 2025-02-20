@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import InputField from '../input/InputField';
+import './FormSignIn.scss'
 
 interface SignInData {
     email: string;
@@ -60,7 +61,7 @@ const FormSignIn: React.FC = () => {
         `;
 
         try {
-            const response = await fetch("http://localhost:5000/graphql", {
+            const response = await fetch("http://localhost:5001/graphql", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ query }),

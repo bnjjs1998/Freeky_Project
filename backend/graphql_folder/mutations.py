@@ -1,45 +1,43 @@
 from datetime import datetime, date
-
-import bcrypt
 import graphene
+from graphene import ObjectType, String, Field, Boolean, List, Int
 from flask_bcrypt import check_password_hash
 from flask_jwt_extended import create_access_token
-from graphene import ObjectType, String, Field, Boolean
- # Import de la connexion MongoDB
-from .schema import EventType
-from .schema import UserType
-from .schema import Query
-from backend import database
-from backend.database import events_collection, db
+from database import events_collection  # Import de la connexion MongoDB
+from graphql_folder.schema import EventType, UserType  # Import des modèles GraphQL
+from database import db
+import bcrypt
 
-
+# Mutation pour ajouter un événement
 class CreateEvent(graphene.Mutation):
     class Arguments:
         name = graphene.String(required=True)
+        description = graphene.String()
         date = graphene.String(required=True)
         location = graphene.String(required=True)
-        guests_list = graphene.List(graphene.String) # Liste des invités (optionnel ?)
-        invites_number = graphene.Int(required=True)
+        invitesNumber = graphene.Int(required=True)
 
     success = graphene.Boolean()
     event = graphene.Field(EventType)
 
-    def mutate(self, info, name, date, location, guests_list, invites_number):
-        nouvelle_soiree = {
+    def mutate(self, info, name, description, date, location, invitesNumber):
+        new_event = {
             "name": name,
+            "description": description if description else "",
             "date": date,
             "location": location,
-            "guests_list": guests_list,
-            "invites_number": invites_number
+            "invitesNumber": invitesNumber
         }
-
-
-        events_collection.insert_one(nouvelle_soiree)  # Ajout dans MongoDB
-        return CreateEvent(success=True, event=nouvelle_soiree)
-
-# Ajouter la mutation au schéma
-class Mutation(ObjectType):
-    create_event = CreateEvent.Field()
+        inserted_event = events_collection.insert_one(new_event)
+        new_event["id"] = str(inserted_event.inserted_id)
+        return CreateEvent(success=True, event=EventType(
+            name=new_event["name"],
+            description=new_event["description"],
+            date=new_event["date"],
+            location=new_event["location"],
+            guestsList=[],  # Ajout de guestsList vide par défaut
+            invitesNumber=new_event["invitesNumber"]
+        ))
 
 # Mutation pour l'enregistrement d'un utilisateur
 class Register(graphene.Mutation):
@@ -54,6 +52,7 @@ class Register(graphene.Mutation):
 
     def mutate(self, info, firstName, lastName, birthdate, email, password):
         print(firstName, lastName, birthdate, email, password)
+
         # Vérifier si l'email existe déjà
         existing_email = db["users"].find_one(
             {"email": email,},
@@ -87,7 +86,6 @@ class Register(graphene.Mutation):
             "email": email,
             "password": hashed_password.decode('utf-8')
         }
-
         db["users"].insert_one(new_user)
 
         return Register(user=UserType(
@@ -97,6 +95,7 @@ class Register(graphene.Mutation):
             email=email
         ))
 
+# Mutation pour la connexion d'un utilisateur
 class LoginMutation(graphene.Mutation):
     class Arguments:
         email = graphene.String(required=True)
@@ -130,10 +129,9 @@ class LoginMutation(graphene.Mutation):
             user=user,
             message="Connexion réussie."
         )
+
 # Fusion des mutations
 class Mutation(graphene.ObjectType):
+    create_event = CreateEvent.Field()
     register = Register.Field()
     login = LoginMutation.Field()
-
-# Définition du schéma GraphQL (Query + Mutation)
-schema = graphene.Schema(query=Query, mutation=Mutation)
