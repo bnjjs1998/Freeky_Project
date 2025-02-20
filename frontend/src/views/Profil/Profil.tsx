@@ -1,4 +1,4 @@
-import React from 'react'
+import './Profil.scss'
 import FormEvent from '../../Component/form/FormEvent'
 import { useNavigate } from 'react-router-dom'
 
@@ -10,8 +10,8 @@ function Profil({ }: any) {
     }
     return (
         <>
+            <div className='wrapper'>
             <button onClick={handleRedirect}>Back</button>
-            <div>
 
             <h1>Create your event</h1>
             <FormEvent />

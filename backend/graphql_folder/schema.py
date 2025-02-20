@@ -8,6 +8,7 @@ class EventType(ObjectType):
     id = graphene.String()
     name = String()
     description = String()
+    cover = String()
     date = String()
     location = String()
     guestsList = List(String)

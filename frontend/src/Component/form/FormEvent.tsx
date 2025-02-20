@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-
+import './FormEvent.scss'
 // Définition de l'interface Event
 interface Event {
     name: string;
     description: string;
+    cover: string;
     date: string;
     location: string;
     invitesNumber: number;  // 🔹 Correction : camelCase pour matcher le backend
@@ -13,6 +14,7 @@ const FormEvent: React.FC = () => {
     const [eventData, setEventData] = useState<Event>({
         name: '',
         description: '',
+        cover: '',
         date: '',
         location: '',
         invitesNumber: 0,
@@ -38,6 +40,7 @@ const FormEvent: React.FC = () => {
             createEvent(
                 name: "${eventData.name}",
                 description: "${eventData.description}",
+                cover: "${eventData.cover}",
                 date: "${eventData.date}",
                 location: "${eventData.location}",
                 invitesNumber: ${eventData.invitesNumber}
@@ -46,6 +49,7 @@ const FormEvent: React.FC = () => {
                 event {
                     name
                     description
+                    cover
                     date
                     location
                     invitesNumber
@@ -78,7 +82,7 @@ const FormEvent: React.FC = () => {
     };
 
     return (
-        <div>
+        <div className='formContainer'>
             {/* <h2> create event</h2> */}
             <form onSubmit={handleSubmit}>
                 <div>
@@ -99,6 +103,14 @@ const FormEvent: React.FC = () => {
                         value={eventData.description}
                         onChange={handleInputChange}
                     />
+                </div>
+
+                <div>
+                    <label>Cover image</label>
+                    <input 
+                        type="image"
+                        name='cover image'
+                        src={eventData.cover} />
                 </div>
 
                 <div>

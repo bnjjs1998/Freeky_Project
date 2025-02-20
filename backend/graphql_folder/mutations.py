@@ -13,6 +13,7 @@ class CreateEvent(graphene.Mutation):
     class Arguments:
         name = graphene.String(required=True)
         description = graphene.String()
+        cover = graphene.String()
         date = graphene.String(required=True)
         location = graphene.String(required=True)
         invitesNumber = graphene.Int(required=True)
@@ -20,10 +21,11 @@ class CreateEvent(graphene.Mutation):
     success = graphene.Boolean()
     event = graphene.Field(EventType)
 
-    def mutate(self, info, name, description, date, location, invitesNumber):
+    def mutate(self, info, name, description, cover, date, location, invitesNumber):
         new_event = {
             "name": name,
             "description": description if description else "",
+            "cover": cover,
             "date": date,
             "location": location,
             "invitesNumber": invitesNumber
@@ -33,6 +35,7 @@ class CreateEvent(graphene.Mutation):
         return CreateEvent(success=True, event=EventType(
             name=new_event["name"],
             description=new_event["description"],
+            cover=new_event["cover"],
             date=new_event["date"],
             location=new_event["location"],
             guestsList=[],  # Ajout de guestsList vide par défaut

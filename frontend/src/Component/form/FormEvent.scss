@@ -1,0 +1,19 @@
+
+.formContainer {
+  padding: .5rem;
+
+  form {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    margin: .5rem auto;
+    
+    div {
+      width: 100%;
+
+      input {
+        width: 94%;
+      }
+    }
+  }
+}
